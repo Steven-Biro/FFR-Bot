@@ -7,18 +7,18 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-        name: Dockerize
-        command: |
-          docker login -u $DOCKER_USER -p $DOCKER_PASS && \
-          docker build -t fiendsoftheelements/ffr-bot:latest -f Dockerfile . && \
-          docker push fiendsoftheelements/ffr-bot:latest
+          name: Dockerize
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS && \
+            docker build -t fiendsoftheelements/ffr-bot:latest -f Dockerfile . && \
+            docker push fiendsoftheelements/ffr-bot:latest
 
 workflows:
   version: 2
   main:
     jobs:
       - build:
-        filters:
-          branches:
-            only: master
+          filters:
+            branches:
+              only: master
 
