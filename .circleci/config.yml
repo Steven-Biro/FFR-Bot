@@ -9,6 +9,7 @@ jobs:
       - run:
           name: Dockerize
           command: |
+            echo $DISCORD_TOKEN > token.txt && \
             docker login -u $DOCKER_USER -p $DOCKER_PASS && \
             docker build -t fiendsoftheelements/ffr-bot:latest -f Dockerfile . && \
             docker push fiendsoftheelements/ffr-bot:latest
