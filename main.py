@@ -7,7 +7,10 @@ from datetime import datetime, timedelta
 from discord.ext import commands
 from discord.utils import get
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 
 description = 'FFR discord bot'
 
@@ -31,7 +34,7 @@ asyncspoiler = "async-spoilers"
 
 @bot.event
 async def on_ready():
-    print('Logged in as')
+    print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), ' Logged in as')
     print(bot.user.name)
     print(bot.user.id)
     print('------')
@@ -331,8 +334,8 @@ def run_client(client, *args, **kwargs):
             loop.run_until_complete(client.logout())
             break
         except Exception as e:
-            print("Error", e)
-        print("Waiting until restart")
+            print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " Error", e)
+        print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " Waiting until restart")
         time.sleep(Sleep_Time)
 
 
