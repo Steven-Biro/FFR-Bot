@@ -9,7 +9,7 @@ from discord.utils import get
 
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.DEBUG,
+    level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')
 
 description = 'FFR discord bot'
@@ -342,6 +342,7 @@ def run_client(client, *args, **kwargs):
 
 with open('token.txt', 'r') as f:
     token = f.read()
+token = token.strip()
 
 
 run_client(bot, token)
