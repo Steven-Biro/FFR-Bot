@@ -9,7 +9,7 @@ from discord.utils import get
 
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.INFO,
+    level=logging.DEBUG,
     datefmt='%Y-%m-%d %H:%M:%S')
 
 description = 'FFR discord bot'
@@ -329,13 +329,14 @@ def run_client(client, *args, **kwargs):
     loop = asyncio.get_event_loop()
     while True:
         try:
+            print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), "Starting connection")
             loop.run_until_complete(client.start(*args, **kwargs))
         except KeyboardInterrupt:
             loop.run_until_complete(client.logout())
             break
         except Exception as e:
             print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " Error", e)
-        print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " Waiting until restart")
+        print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), "Waiting until restart")
         time.sleep(Sleep_Time)
 
 
