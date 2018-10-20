@@ -100,13 +100,13 @@ async def submit(ctx, runnertime: str = None):
         await bot.add_roles(user, role)
 
         delta = timedelta(hours=t.hour, minutes=t.minute, seconds=t.second)
-        username = re.sub('[()-]', '', user.name)
+        username = re.sub('[()-]', '', user.display_name)
         leaderboard = await getleaderboard(ctx)
         leaderboard_list = leaderboard.content.split("\n")
 
         # the title is at the start and the forfeit # is after the hyphen at the end of the last line
         title = leaderboard_list[0]
-        forfits = int(leaderboard_list[-1].split('-')[-1])
+        forfeits = int(leaderboard_list[-1].split('-')[-1])
 
         # trim the leaderboard to remove the title and forfeit message
         leaderboard_list = leaderboard_list[2:len(leaderboard_list)-2]
@@ -132,15 +132,93 @@ async def submit(ctx, runnertime: str = None):
         for i in range(len(leaderboard_list)):
             new_leaderboard += str(i+1) + ")" + \
                 leaderboard_list[i][0]+"-" + leaderboard_list[i][1] + "\n"
-        new_leaderboard += "\nForfeits - " + str(forfits)
+        new_leaderboard += "\nForfeits - " + str(forfeits)
 
         await bot.edit_message(leaderboard, new_leaderboard)
         await bot.send_message(await getspoilerchat(ctx), 'GG %s' % user.mention)
         await bot.purge_from(ctx.message.channel, limit=1)
-        await incrementparticipants(ctx)
+        await changeparticipants(ctx)
     else:
         await bot.send_message(user, "You already have the relevent role.")
         await bot.purge_from(ctx.message.channel, limit=1)
+
+@bot.command(pass_context=True)
+async def remove(ctx, *, players: str = None):
+    """
+    Removes people from the leaderboard and allows them to reenter a time
+    This entire function is gross, it works but is messy
+    :param ctx: context of the command
+    :param players: @mentions of the players that will be removed from the leaderboard
+    :return: None
+    """
+    user = ctx.message.author
+    if players is None:
+        await bot.send_message(user, "You did not mention a player.")
+        await bot.purge_from(ctx.message.channel, limit=1)
+        print("players==none")
+        return
+
+    channel = ctx.message.channel
+    roles = ctx.message.server.roles
+    role = None
+    channels = ctx.message.server.channels
+    challengeseed = get(channels, name=challengeseedleaderboard)
+    asyncseed = get(channels, name=asyncleaderboard)
+    if channel == challengeseed:
+        role = get(roles, name=challengeseedadmin)
+        remove_role = get(roles, name= challengeseedrole)
+        participantnumchannel = get(channels, name= challengeseedchannel)
+    if channel == asyncseed:
+        role = get(roles, name=asyncseedadmin)
+        remove_role = get(roles, name=asyncseedrole)
+        participantnumchannel = get(channels, name=asyncchannel)
+    if role in user.roles:
+        leaderboard = bot.logs_from(channel, 100, reverse=True)
+        async for x in leaderboard:
+            if bot.user == x.author:
+                leaderboard = x
+
+        leaderboard_list = leaderboard.content.split("\n")
+
+        # the title is at the start and the forfeit # is after the hyphen at the end of the last line
+        title = leaderboard_list[0]
+        forfeits = int(leaderboard_list[-1].split('-')[-1])
+
+        # trim the leaderboard to remove the title and forfeit message
+        leaderboard_list = leaderboard_list[2:len(leaderboard_list) - 2]
+
+        for i in range(len(leaderboard_list)):
+            leaderboard_list[i] = re.split('[)-]', leaderboard_list[i])[1:]
+
+        players = ctx.message.mentions
+        if not players:
+            await bot.send_message(user, "You did not mention a player.")
+            await bot.purge_from(ctx.message.channel, limit=1)
+            return
+
+        for player in players:
+            i = 0
+            for i in range(len(leaderboard_list)):
+                if leaderboard_list[i][0] == re.sub('[()-]', '', player.display_name):
+                    break
+            del leaderboard_list[i]
+            await bot.remove_roles(player, remove_role)
+            await changeparticipants(ctx, increment=False, channel=participantnumchannel)
+
+        # should already be sorted
+        #leaderboard_list.sort(
+         #   key=lambda x: datetime.strptime(x[1].strip(), "%H:%M:%S"))
+
+        # build the string for the leaderboard
+        new_leaderboard = title + "\n\n"
+        for i in range(len(leaderboard_list)):
+            new_leaderboard += str(i + 1) + ")" + \
+                               leaderboard_list[i][0] + "-" + leaderboard_list[i][1] + "\n"
+        new_leaderboard += "\nForfeits - " + str(forfeits)
+
+        await bot.edit_message(leaderboard, new_leaderboard)
+        await bot.purge_from(ctx.message.channel, limit=1)
+
 
 
 @bot.command(pass_context=True)
@@ -191,14 +269,14 @@ async def forfeit(ctx):
         await bot.add_roles(user, role)
         leaderboard = await getleaderboard(ctx)
         new_leaderboard = leaderboard.content.split("\n")
-        forfits = int(new_leaderboard[-1].split("-")[-1]) + 1
-        new_leaderboard[-1] = "Forfeits - " + str(forfits)
+        forfeits = int(new_leaderboard[-1].split("-")[-1]) + 1
+        new_leaderboard[-1] = "Forfeits - " + str(forfeits)
         seperator = "\n"
         new_leaderboard = seperator.join(new_leaderboard)
 
         await bot.edit_message(leaderboard, new_leaderboard)
         await bot.purge_from(ctx.message.channel, limit=1)
-        await incrementparticipants(ctx)
+        await changeparticipants(ctx)
     else:
         await bot.purge_from(ctx.message.channel, limit=1)
 
@@ -302,18 +380,23 @@ async def getspoilerchat(ctx):
     return spoilerchat
 
 
-async def incrementparticipants(ctx):
+async def changeparticipants(ctx,increment = True, channel = None):
     """
-    Increments the participant number
+    changes the participant number
     :param ctx: context of the command
+    :param increment: sets if it is incremented or decremented
     :return: None
     """
-    participants = bot.logs_from(ctx.message.channel, 100, reverse=True)
+
+    participants = bot.logs_from(ctx.message.channel if channel is None else channel, 100, reverse=True)
     async for x in participants:
         if x.author == bot.user:
             participants = x
     num_partcipents = int(participants.content.split(":")[1])
-    num_partcipents += 1
+    if increment:
+        num_partcipents += 1
+    else:
+        num_partcipents -= 1
     new_participants = "Number of participants: " + str(num_partcipents)
     await bot.edit_message(participants, new_participants)
 
