@@ -119,18 +119,19 @@ class Weekly:
         saves the current board to a text file in the leaderboards folder
         :return: None
         """
-        #TODO fix saveboard and loadboard to take a board name to load
-        with open('leaderboards/' + self.__leaderboardchannel, 'r+') as f:
+        with open('leaderboards/' + self.__leaderboardchannel+"/"+self.__board["name"], 'r+') as f:
             f.seek(0)
             json.dump(self.__board, f)
             f.truncate()
 
-    def loadboard(self):
+    def loadboard(self, name = None):
         """
-        loads a leaderboard from the leaderboards folder
+        loads a leaderboard from the leaderboards folder, if no name is provided, it uses the current board's name
+        :param name: name of the leaderboard to load
         :return: None
         """
-        with open('leaderboards/' + self.__leaderboardchannel, 'r+') as f:
+        with open('leaderboards/' + self.__leaderboardchannel+"/"+
+                          name if name != None else self.__board["name"], 'r+') as f:
             self.__board = json.load(f)
 
     def initializeleaderboard(self, name, leaderboardnum = 1, *args):
