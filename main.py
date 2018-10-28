@@ -53,15 +53,12 @@ async def multi(ctx, raceid: str = None):
     if raceid == None:
         await bot.send_message(user, "You need to supply the race id to get the multistream link.")
         return
-    # try:
     link = multistream(raceid)
     if link == None:
         await bot.say('There is no race with that 5 character id, try remove "srl-" from the room id.')
     else:
         await bot.say(link)
 
-    # except Exception as e:
-    #     print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " Error", e, "in multistream method.")
 
 
 def multistream(raceid):
