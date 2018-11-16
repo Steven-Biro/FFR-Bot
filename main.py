@@ -5,6 +5,9 @@ import time
 import sqlite3
 from datetime import datetime, timedelta
 import weekly
+import urllib.request
+import json
+from io import StringIO
 
 from discord.ext import commands
 from discord.utils import get
@@ -45,6 +48,43 @@ async def createleaderboard(ctx, name: str,  num: int, *args: str):
     await Weeklies[str(ctx.channel.category())].initializeleaderboard(name, num, *args)
     await ctx.channel.purge(1)
 
+
+@bot.command(pass_context=True)
+async def multi(ctx, raceid: str = None):
+    user = ctx.message.author
+
+    if raceid == None:
+        await bot.send_message(user, "You need to supply the race id to get the multistream link.")
+        return
+    link = multistream(raceid)
+    if link == None:
+        await bot.say('There is no race with that 5 character id, try remove "srl-" from the room id.')
+    else:
+        await bot.say(link)
+
+
+
+def multistream(raceid):
+
+    srl_tmp = r"http://api.speedrunslive.com/races/{}"
+    ms_tmp = r"http://multistre.am/{}/"
+    srlurl = srl_tmp.format(raceid)
+    data = ""
+    with urllib.request.urlopen(srlurl) as response:
+        data = response.read()
+
+    data = data.decode()
+    srlio = StringIO(data)
+    srl_json = json.load(srlio)
+    try:
+        entrants = [srl_json['entrants'][k]['twitch'] for k in srl_json['entrants'].keys() if
+                    srl_json['entrants'][k]['statetext'] == "Ready"]
+    except KeyError:
+        return None
+    entrants_2 = r'/'.join(entrants)
+    ret = ms_tmp.format(entrants_2)
+    return ret
+
 @bot.command()
 async def submit(ctx, runnertime: str = None):
     if runnertime is None:
@@ -64,8 +104,9 @@ async def submit(ctx, runnertime: str = None):
         return
 
 
-    challenge.addtoleaderboard(ctx.author.id,ctx.author.display_name,)
-    Weeklies[str(ctx.channel.category())].
+
+    challenge.addtoleaderboard(ctx.author.id,ctx.author.display_name,t,ctx.author.roles)
+    Weeklies[str(ctx.channel.category())].addtoleaderboard(ctx.author.id,ctx.author.display_name,)
 
 
 def run_client(client, *args, **kwargs):

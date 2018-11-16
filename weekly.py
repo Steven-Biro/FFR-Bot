@@ -167,7 +167,7 @@ class Weekly:
             self.__board[str(i)]["times"] = []
             self.__board[str(i)]["forfeits"] = 0
 
-    def addtoleaderboard(self, id, name, time, roles, matchrole = True):
+    def addtoleaderboard(self, id, name, time, roles):
         """
         adds a player time to the leaderboard based on the role matching or not
         ":param id: player unique id
@@ -179,7 +179,7 @@ class Weekly:
         """
         key = None
         for i in range(self.__board["num"]):
-            if (self.__board[str(i)]["role"] in roles) ^ (not matchrole):
+            if (self.__board[str(i)]["role"] in roles) ^ (not self.__board[]):
                 key = str(i)
                 break
         if key == None:
