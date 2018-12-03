@@ -245,9 +245,10 @@ async def remove(ctx, *, players: str = None):
             for i in range(len(leaderboard_list)):
                 if leaderboard_list[i][0] == re.sub('[()-]', '', player.display_name):
                     del leaderboard_list[i]
+                    await bot.remove_roles(player, remove_role)
+                    await changeparticipants(ctx, increment=False, channel=participantnumchannel)
                     break
-            await bot.remove_roles(player, remove_role)
-            await changeparticipants(ctx, increment=False, channel=participantnumchannel)
+            
 
         # should already be sorted
         #leaderboard_list.sort(
