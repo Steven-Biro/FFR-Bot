@@ -244,8 +244,8 @@ async def remove(ctx, *, players: str = None):
             i = 0
             for i in range(len(leaderboard_list)):
                 if leaderboard_list[i][0] == re.sub('[()-]', '', player.display_name):
+                    del leaderboard_list[i]
                     break
-            del leaderboard_list[i]
             await bot.remove_roles(player, remove_role)
             await changeparticipants(ctx, increment=False, channel=participantnumchannel)
 
@@ -494,7 +494,7 @@ def run_client(client, *args, **kwargs):
         print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), "Waiting until restart")
         time.sleep(Sleep_Time)
 
- 
+
 with open('token.txt', 'r') as f:
     token = f.read()
 token = token.strip()
