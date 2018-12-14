@@ -275,6 +275,7 @@ async def createleaderboard(ctx, name: str = None):
     :param name: title of the leaderboard
     :return: None
     """
+    
     user = ctx.message.author
     if name is None:
         bot.send_message(user, "You did not submit a name.")
