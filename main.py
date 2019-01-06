@@ -280,7 +280,7 @@ async def createleaderboard(ctx, name: str = None):
     if name is None:
         bot.send_message(user, "You did not submit a name.")
         await bot.purge_from(ctx.message.channel, limit=1)
-        return
+        return 
     role = await getrole(ctx)
 
     # gross way of doing this, works for now
