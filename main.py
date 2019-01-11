@@ -85,7 +85,7 @@ def flagseedgen(flags,site):
 
 @bot.command(pass_context=True)
 async def ff1seed(ctx):
-    bot.say("{0:-0{1}x}".format(random.randint(0, 4294967295),8))
+    await bot.say("{0:-0{1}x}".format(random.randint(0, 4294967295),8))
 
 
 @bot.command(pass_context=True)
