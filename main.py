@@ -3,6 +3,7 @@ import logging
 import re
 import time
 from datetime import datetime, timedelta
+import random
 
 import urllib
 import urllib.request
@@ -46,6 +47,21 @@ async def on_ready():
     print(bot.user.id)
     print('------')
 
+
+@bot.command(pass_context=True)
+async def ff1flags(ctx, flags: str = None, site: str = None):
+    user = ctx.message.author
+    if flags == None:
+        await bot.send_message(user, "You need to supply the flags to role a seed.")
+        return
+    seed = random.randint(0, 4294967295)
+    # print("{0:-0{1}x}".format(seed,8))
+    url = ""
+    if site:
+        url += site +"."
+
+    url += "http://finalfantasyrandomizer.com/Home/Randomize?s=" + ("{0:-0{1}x}".format(seed,8)) + "&f=" + flags
+    await bot.say(url)
 
 @bot.command(pass_context=True)
 async def multi(ctx, raceid: str = None):
