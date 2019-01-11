@@ -54,14 +54,39 @@ async def ff1flags(ctx, flags: str = None, site: str = None):
     if flags == None:
         await bot.send_message(user, "You need to supply the flags to role a seed.")
         return
+    await bot.say(flagseedgen(flags, site))
+
+@bot.command(pass_context=True)
+async def ff1beta(ctx, flags: str = None):
+    user = ctx.message.author
+    site = "beta"
+    if flags == None:
+        await bot.send_message(user, "You need to supply the flags to role a seed.")
+        return
+    await bot.say(flagseedgen(flags, site))
+
+@bot.command(pass_context=True)
+async def ff1alpha(ctx, flags: str = None):
+    user = ctx.message.author
+    site = "alpha"
+    if flags == None:
+        await bot.send_message(user, "You need to supply the flags to role a seed.")
+        return
+    await bot.say(flagseedgen(flags, site))
+
+def flagseedgen(flags,site):
     seed = random.randint(0, 4294967295)
-    # print("{0:-0{1}x}".format(seed,8))
-    url = ""
+    url = "http://"
     if site:
         url += site +"."
 
-    url += "http://finalfantasyrandomizer.com/Home/Randomize?s=" + ("{0:-0{1}x}".format(seed,8)) + "&f=" + flags
-    await bot.say(url)
+    url += "finalfantasyrandomizer.com/Home/Randomize?s=" + ("{0:-0{1}x}".format(seed,8)) + "&f=" + flags
+    return url
+
+@bot.command(pass_context=True)
+async def ff1seed(ctx):
+    bot.say("{0:-0{1}x}".format(random.randint(0, 4294967295),8))
+
 
 @bot.command(pass_context=True)
 async def multi(ctx, raceid: str = None):
