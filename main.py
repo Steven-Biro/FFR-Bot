@@ -120,9 +120,21 @@ async def multi(ctx, raceid: str = None):
     else:
         await bot.say(link)
 
+@bot.command(pass_context=True)
+async def multiall(ctx, raceid: str = None):
+    user = ctx.message.author
+
+    if raceid == None:
+        await bot.send_message(user, "You need to supply the race id to get the multistream link.")
+        return
+    link = multistream(raceid, True)
+    if link == None:
+        await bot.say('There is no race with that 5 character id, try remove "srl-" from the room id.')
+    else:
+        await bot.say(link)
 
 
-def multistream(raceid):
+def multistream(raceid, all: bool = False):
 
     srl_tmp = r"http://api.speedrunslive.com/races/{}"
     ms_tmp = r"http://multistre.am/{}/"
@@ -136,7 +148,7 @@ def multistream(raceid):
     srl_json = json.load(srlio)
     try:
         entrants = [srl_json['entrants'][k]['twitch'] for k in srl_json['entrants'].keys() if
-                    srl_json['entrants'][k]['statetext'] == "Ready"]
+                    (srl_json['entrants'][k]['statetext'] == "Ready") or all]
     except KeyError:
         return None
     entrants_2 = r'/'.join(entrants)
