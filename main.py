@@ -51,6 +51,10 @@ async def on_ready():
 @bot.command(pass_context=True)
 async def ff1flags(ctx, flags: str = None, site: str = None):
     user = ctx.message.author
+    if ctx.message.channel.name != "call_for_races":
+        await bot.purge_from(ctx.message.channel, limit=1)
+        await bot.send_message(user, "please only use that command in 'call_for_races'")
+        return
     if flags == None:
         await bot.send_message(user, "You need to supply the flags to role a seed.")
         return
@@ -59,6 +63,10 @@ async def ff1flags(ctx, flags: str = None, site: str = None):
 @bot.command(pass_context=True)
 async def ff1beta(ctx, flags: str = None):
     user = ctx.message.author
+    if ctx.message.channel.name != "call_for_races":
+        await bot.purge_from(ctx.message.channel, limit=1)
+        await bot.send_message(user, "please only use that command in 'call_for_races'")
+        return
     site = "beta"
     if flags == None:
         await bot.send_message(user, "You need to supply the flags to role a seed.")
@@ -68,7 +76,13 @@ async def ff1beta(ctx, flags: str = None):
 @bot.command(pass_context=True)
 async def ff1alpha(ctx, flags: str = None):
     user = ctx.message.author
+    if ctx.message.channel.name != "call_for_races":
+        await bot.purge_from(ctx.message.channel, limit=1)
+        await bot.send_message(user, "please only use that command in 'call_for_races'")
+        return
     site = "alpha"
+    if ctx.message.channel.name != "call_for_races":
+        return
     if flags == None:
         await bot.send_message(user, "You need to supply the flags to role a seed.")
         return
@@ -85,6 +99,11 @@ def flagseedgen(flags,site):
 
 @bot.command(pass_context=True)
 async def ff1seed(ctx):
+    user = ctx.message.author
+    if ctx.message.channel.name != "call_for_races":
+        await bot.purge_from(ctx.message.channel, limit=1)
+        await bot.send_message(user, "please only use that command in 'call_for_races'")
+        return
     await bot.say("{0:-0{1}x}".format(random.randint(0, 4294967295),8))
 
 
