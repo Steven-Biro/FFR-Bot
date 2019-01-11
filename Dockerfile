@@ -1,4 +1,4 @@
-FROM gorialis/discord.py:3.6-alpine-minimal
+FROM septimusd/ffrbot:3.6.7-alpine
 
 WORKDIR /usr/src/app
 COPY main.py .
