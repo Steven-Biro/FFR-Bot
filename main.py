@@ -135,7 +135,6 @@ async def multiall(ctx, raceid: str = None):
 
 
 def multistream(raceid, all: bool = False):
-
     srl_tmp = r"http://api.speedrunslive.com/races/{}"
     ms_tmp = r"http://multistre.am/{}/"
     srlurl = srl_tmp.format(raceid)
