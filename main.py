@@ -129,7 +129,7 @@ async def multiall(ctx, raceid: str = None):
         return
     link = multistream(raceid, True)
     if link == None:
-        await bot.say('There is no race with that 5 character id, try remove "srl-" from the room id.')
+        await bot.say('There is no race with that 5 character id')
     else:
         await bot.say(link)
 
@@ -137,6 +137,8 @@ async def multiall(ctx, raceid: str = None):
 def multistream(raceid, all: bool = False):
     srl_tmp = r"http://api.speedrunslive.com/races/{}"
     ms_tmp = r"http://multistre.am/{}/"
+    if raceid[0:4] == 'srl-':
+        raceid = raceid[4:]
     srlurl = srl_tmp.format(raceid)
     data = ""
     with urllib.request.urlopen(srlurl) as response:
