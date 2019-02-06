@@ -156,7 +156,6 @@ def multistream(raceid, all: bool = False):
     ret = ms_tmp.format(entrants_2)
     return ret
 
-
 @bot.command(pass_context=True)
 async def purgemembers(ctx):
     """
