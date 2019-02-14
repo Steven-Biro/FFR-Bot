@@ -108,7 +108,7 @@ async def ff1seed(ctx):
 
 
 @bot.command(pass_context=True)
-async def multi(ctx, raceid: str = None):
+async def multireadied(ctx, raceid: str = None):
     user = ctx.message.author
 
     if raceid == None:
@@ -121,7 +121,7 @@ async def multi(ctx, raceid: str = None):
         await bot.say(link)
 
 @bot.command(pass_context=True)
-async def multiall(ctx, raceid: str = None):
+async def multi(ctx, raceid: str = None):
     user = ctx.message.author
 
     if raceid == None:
