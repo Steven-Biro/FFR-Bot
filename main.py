@@ -106,7 +106,6 @@ async def ff1seed(ctx):
         return
     await bot.say("{0:-0{1}x}".format(random.randint(0, 4294967295),8))
 
- 
 @bot.command(pass_context=True)
 async def multireadied(ctx, raceid: str = None):
     user = ctx.message.author
