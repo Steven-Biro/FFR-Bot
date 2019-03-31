@@ -97,6 +97,7 @@ def flagseedgen(flags,site):
     url += "finalfantasyrandomizer.com/Home/Randomize?s=" + ("{0:-0{1}x}".format(seed,8)) + "&f=" + flags
     return url
 
+
 @bot.command(pass_context=True)
 async def ff1seed(ctx):
     user = ctx.message.author
