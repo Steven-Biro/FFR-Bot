@@ -10,9 +10,9 @@ import urllib.request
 import json
 from io import StringIO
 
-
 from discord.ext import commands
 from discord.utils import get
+
 
 # format logging
 logging.basicConfig(
@@ -48,45 +48,45 @@ async def on_ready():
     print('------')
 
 
-@bot.command(pass_context=True)
+@bot.command()
 async def ff1flags(ctx, flags: str = None, site: str = None):
     user = ctx.message.author
     if ctx.message.channel.name != "call_for_races":
-        await bot.purge_from(ctx.message.channel, limit=1)
-        await bot.send_message(user, "please only use that command in 'call_for_races'")
+        await ctx.message.delete()
+        await user.send("please only use that command in 'call_for_races'")
         return
     if flags == None:
-        await bot.send_message(user, "You need to supply the flags to role a seed.")
+        await user.send("You need to supply the flags to role a seed.")
         return
-    await bot.say(flagseedgen(flags, site))
+    await ctx.channel.send(flagseedgen(flags, site))
 
-@bot.command(pass_context=True)
+@bot.command()
 async def ff1beta(ctx, flags: str = None):
     user = ctx.message.author
     if ctx.message.channel.name != "call_for_races":
-        await bot.purge_from(ctx.message.channel, limit=1)
-        await bot.send_message(user, "please only use that command in 'call_for_races'")
+        await ctx.message.delete()
+        await user.send("please only use that command in 'call_for_races'")
         return
     site = "beta"
     if flags == None:
-        await bot.send_message(user, "You need to supply the flags to role a seed.")
+        await user.send("You need to supply the flags to role a seed.")
         return
-    await bot.say(flagseedgen(flags, site))
+    await ctx.channel.send(flagseedgen(flags, site))
 
-@bot.command(pass_context=True)
+@bot.command()
 async def ff1alpha(ctx, flags: str = None):
     user = ctx.message.author
     if ctx.message.channel.name != "call_for_races":
-        await bot.purge_from(ctx.message.channel, limit=1)
-        await bot.send_message(user, "please only use that command in 'call_for_races'")
+        await ctx.message.delete()
+        await user.send("please only use that command in 'call_for_races'")
         return
     site = "alpha"
     if ctx.message.channel.name != "call_for_races":
         return
     if flags == None:
-        await bot.send_message(user, "You need to supply the flags to role a seed.")
+        await user.send("You need to supply the flags to role a seed.")
         return
-    await bot.say(flagseedgen(flags, site))
+    await ctx.channel.send(flagseedgen(flags, site))
 
 def flagseedgen(flags,site):
     seed = random.randint(0, 4294967295)
@@ -98,40 +98,40 @@ def flagseedgen(flags,site):
     return url
 
 
-@bot.command(pass_context=True)
+@bot.command()
 async def ff1seed(ctx):
     user = ctx.message.author
     if ctx.message.channel.name != "call_for_races":
-        await bot.purge_from(ctx.message.channel, limit=1)
-        await bot.send_message(user, "please only use that command in 'call_for_races'")
+        await ctx.message.delete()
+        await user.send("please only use that command in 'call_for_races'")
         return
-    await bot.say("{0:-0{1}x}".format(random.randint(0, 4294967295),8))
+    await ctx.channel.send("{0:-0{1}x}".format(random.randint(0, 4294967295),8))
 
-@bot.command(pass_context=True)
+@bot.command()
 async def multireadied(ctx, raceid: str = None):
     user = ctx.message.author
 
     if raceid == None:
-        await bot.send_message(user, "You need to supply the race id to get the multistream link.")
+        await user.send("You need to supply the race id to get the multistream link.")
         return
     link = multistream(raceid)
     if link == None:
-        await bot.say('There is no race with that 5 character id, try remove "srl-" from the room id.')
+        await ctx.channel.send('There is no race with that 5 character id, try remove "srl-" from the room id.')
     else:
-        await bot.say(link)
+        await ctx.channel.send(link)
 
-@bot.command(pass_context=True)
+@bot.command()
 async def multi(ctx, raceid: str = None):
     user = ctx.message.author
 
     if raceid == None:
-        await bot.send_message(user, "You need to supply the race id to get the multistream link.")
+        await user.send("You need to supply the race id to get the multistream link.")
         return
     link = multistream(raceid, True)
     if link == None:
-        await bot.say('There is no race with that 5 character id')
+        await ctx.channel.send('There is no race with that 5 character id')
     else:
-        await bot.say(link)
+        await ctx.channel.send(link)
 
 
 def multistream(raceid, all: bool = False):
@@ -156,7 +156,7 @@ def multistream(raceid, all: bool = False):
     ret = ms_tmp.format(entrants_2)
     return ret
 
-@bot.command(pass_context=True)
+@bot.command()
 async def purgemembers(ctx):
     """
     Removes members from the role associated with the channel,
@@ -169,23 +169,23 @@ async def purgemembers(ctx):
 
     if role in user.roles and role.name in adminroles:
         if role.name == challengeseedadmin:
-            role = get(ctx.message.server.roles, name=challengeseedrole)
+            role = get(ctx.message.guild.roles, name=challengeseedrole)
         else:
-            role = get(ctx.message.server.roles, name=asyncseedrole)
-        members = ctx.message.server.members
+            role = get(ctx.message.guild.roles, name=asyncseedrole)
+        members = ctx.message.guild.members
         role_members = [x for x in members if role in x.roles]
 
         for x in role_members:
-            await bot.remove_roles(x, role)
+            await x.remove_roles(role)
     else:
-        await bot.send_message(user, ("... Wait a second.. YOU AREN'T AN ADMIN! (note, you need the correct admin role"
+        await user.send(("... Wait a second.. YOU AREN'T AN ADMIN! (note, you need the correct admin role"
                                       " and need to use this in the spoilerchat for the role you want to purge members"
                                       " from)"))
 
-    await bot.purge_from(ctx.message.channel, limit=1)
+    await ctx.message.delete()
 
 
-@bot.command(pass_context=True)
+@bot.command()
 async def submit(ctx, runnertime: str = None):
     """
     Submits a runners time to the leaderboard and gives the appropriate role
@@ -197,8 +197,8 @@ async def submit(ctx, runnertime: str = None):
     role = await getrole(ctx)
 
     if runnertime is None:
-        await bot.send_message(user, "You must include a time when you submit a time.")
-        await bot.purge_from(ctx.message.channel, limit=1)
+        await user.send("You must include a time when you submit a time.")
+        await ctx.message.delete()
         return
 
     if role is not None and role not in user.roles and role.name in nonadminroles:
@@ -208,12 +208,12 @@ async def submit(ctx, runnertime: str = None):
             # style on the leaderboard
             t = datetime.strptime(runnertime, "%H:%M:%S")
         except ValueError:
-            await bot.send_message(user, "The time you provided '" + str(runnertime) +
+            await user.send("The time you provided '" + str(runnertime) +
                                    "', this is not in the format HH:MM:SS (or you took a day or longer)")
-            await bot.purge_from(ctx.message.channel, limit=1)
+            await ctx.message.delete()
             return
 
-        await bot.add_roles(user, role)
+        await user.add_roles(role)
 
         delta = timedelta(hours=t.hour, minutes=t.minute, seconds=t.second)
         username = re.sub('[()-]', '', user.display_name)
@@ -250,16 +250,16 @@ async def submit(ctx, runnertime: str = None):
                 leaderboard_list[i][0]+"-" + leaderboard_list[i][1] + "\n"
         new_leaderboard += "\nForfeits - " + str(forfeits)
 
-        await bot.edit_message(leaderboard, new_leaderboard)
-        await bot.send_message(await getspoilerchat(ctx), 'GG %s' % user.mention)
-        await bot.purge_from(ctx.message.channel, limit=1)
+        await leaderboard.edit(content=new_leaderboard)
+        await (await getspoilerchat(ctx)).send('GG %s' % user.mention)
+        await ctx.message.delete()
         await changeparticipants(ctx)
     else:
-        await bot.send_message(user, "You already have the relevent role.")
-        await bot.purge_from(ctx.message.channel, limit=1)
+        await user.send("You already have the relevent role.")
+        await ctx.message.delete()
 
-@bot.command(pass_context=True)
-async def remove(ctx, *, players: str = None):
+@bot.command()
+async def remove(ctx):
     """
     Removes people from the leaderboard and allows them to reenter a time
     This entire function is gross, it works but is messy
@@ -268,16 +268,15 @@ async def remove(ctx, *, players: str = None):
     :return: None
     """
     user = ctx.message.author
-    if players is None:
-        await bot.send_message(user, "You did not mention a player.")
-        await bot.purge_from(ctx.message.channel, limit=1)
-        print("players==none")
+    if ctx.message.mentions is None:
+        await user.send("You did not mention a player.")
+        await ctx.message.delete()
         return
 
     channel = ctx.message.channel
-    roles = ctx.message.server.roles
+    roles = ctx.message.guild.roles
     role = None
-    channels = ctx.message.server.channels
+    channels = ctx.message.guild.channels
     challengeseed = get(channels, name=challengeseedleaderboard)
     asyncseed = get(channels, name=asyncleaderboard)
     if channel == challengeseed:
@@ -289,7 +288,7 @@ async def remove(ctx, *, players: str = None):
         remove_role = get(roles, name=asyncseedrole)
         participantnumchannel = get(channels, name=asyncchannel)
     if role in user.roles:
-        leaderboard = bot.logs_from(channel, 100, reverse=True)
+        leaderboard = channel.history(oldest_first=True, limit=100)
         async for x in leaderboard:
             if bot.user == x.author:
                 leaderboard = x
@@ -308,16 +307,16 @@ async def remove(ctx, *, players: str = None):
 
         players = ctx.message.mentions
         if not players:
-            await bot.send_message(user, "You did not mention a player.")
-            await bot.purge_from(ctx.message.channel, limit=1)
+            await user.send("You did not mention a player.")
+            await ctx.message.delete()
             return
 
         for player in players:
             i = 0
             for i in range(len(leaderboard_list)):
-                if leaderboard_list[i][0] == re.sub('[()-]', '', player.display_name):
+                if leaderboard_list[i][0][1:len(leaderboard_list[i][0])-1] == re.sub('[()-]', '', player.display_name):
                     del leaderboard_list[i]
-                    await bot.remove_roles(player, remove_role)
+                    await player.remove_roles(remove_role)
                     await changeparticipants(ctx, increment=False, channel=participantnumchannel)
                     break
             
@@ -333,14 +332,14 @@ async def remove(ctx, *, players: str = None):
                                leaderboard_list[i][0] + "-" + leaderboard_list[i][1] + "\n"
         new_leaderboard += "\nForfeits - " + str(forfeits)
 
-        await bot.edit_message(leaderboard, new_leaderboard)
-        await bot.purge_from(ctx.message.channel, limit=1)
+        await leaderboard.edit(content=new_leaderboard)
+        await ctx.message.delete()
 
 
 
 
-@bot.command(pass_context=True)
-async def createleaderboard(ctx, name: str = None):
+@bot.command()
+async def createleaderboard(ctx, name):
     """
     Creates a leaderboard post with a title and the number of forfeits
     :param ctx: context of the command
@@ -350,30 +349,28 @@ async def createleaderboard(ctx, name: str = None):
     
     user = ctx.message.author
     if name is None:
-        bot.send_message(user, "You did not submit a name.")
-        await bot.purge_from(ctx.message.channel, limit=1)
+        await user.send("You did not submit a name.")
+        await ctx.message.delete()
         return
     role = await getrole(ctx)
 
     # gross way of doing this, works for now
     if role in user.roles and role.name == challengeseedadmin:
-        await bot.send_message(get(ctx.message.server.channels, name=challengeseedleaderboard),
-                               name+"\n\nForfeits - 0")
-        await bot.send_message(get(ctx.message.server.channels, name=challengeseedchannel), "Number of participants: 0")
+        await get(ctx.message.guild.channels, name=challengeseedleaderboard).send(name+"\n\nForfeits - 0")
+        await get(ctx.message.guild.channels, name=challengeseedchannel).send("Number of participants: 0")
 
     elif role in user.roles and role.name == asyncseedadmin:
-        await bot.send_message(get(ctx.message.server.channels, name=asyncleaderboard),
-                               name + "\n\nForfeits - 0")
-        await bot.send_message(get(ctx.message.server.channels, name=asyncchannel), "Number of participants: 0")
+        await get(ctx.message.guild.channels, name=asyncleaderboard).send(name + "\n\nForfeits - 0")
+        await get(ctx.message.guild.channels, name=asyncchannel).send("Number of participants: 0")
 
     else:
-        await bot.send_message(user, ("... Wait a second.. YOU AREN'T AN ADMIN! (note, you need the admin role"
+        await user.send(("... Wait a second.. YOU AREN'T AN ADMIN! (note, you need the admin role"
                                       "for this channel)"))
 
-    await bot.purge_from(ctx.message.channel, limit=1)
+    await ctx.message.delete()
 
 
-@bot.command(pass_context=True)
+@bot.command()
 async def forfeit(ctx):
     """
     Increments the number of forfeits and gives the appropriate role to the user
@@ -385,7 +382,7 @@ async def forfeit(ctx):
     role = await getrole(ctx)
 
     if role is not None and role not in user.roles and role.name in nonadminroles:
-        await bot.add_roles(user, role)
+        await user.add_roles(role)
         leaderboard = await getleaderboard(ctx)
         new_leaderboard = leaderboard.content.split("\n")
         forfeits = int(new_leaderboard[-1].split("-")[-1]) + 1
@@ -393,19 +390,19 @@ async def forfeit(ctx):
         seperator = "\n"
         new_leaderboard = seperator.join(new_leaderboard)
 
-        await bot.edit_message(leaderboard, new_leaderboard)
-        await bot.purge_from(ctx.message.channel, limit=1)
+        await leaderboard.edit(content=new_leaderboard)
+        await ctx.message.delete()
         await changeparticipants(ctx)
     else:
-        await bot.purge_from(ctx.message.channel, limit=1)
+        await ctx.message.delete()
 
 # @bot.command()
 # async def testexit():
-#     await bot.say("exiting, should restart right away")
+#     await ctx.channel.send("exiting, should restart right away")
 #     SystemExit()
 
 
-@bot.command(pass_context=True)
+@bot.command()
 async def spectate(ctx):
     """
     Gives the user the appropriate role
@@ -415,8 +412,8 @@ async def spectate(ctx):
     user = ctx.message.author
     role = await getrole(ctx)
     if role is not None and role.name in nonadminroles:
-        await bot.add_roles(user, role)
-    await bot.purge_from(ctx.message.channel, limit=1)
+        await user.add_roles(role)
+    await ctx.message.delete()
 
 
 async def getrole(ctx):
@@ -428,9 +425,9 @@ async def getrole(ctx):
     """
 
     user = ctx.message.author
-    roles = ctx.message.server.roles
+    roles = ctx.message.guild.roles
     channel = ctx.message.channel
-    channels = ctx.message.server.channels
+    channels = ctx.message.guild.channels
     challengeseed = get(channels, name=challengeseedchannel)
     asyncseed = get(channels, name=asyncchannel)
     chalseedspoilerobj = get(channels, name=challengeseedspoiler)
@@ -445,7 +442,7 @@ async def getrole(ctx):
     elif channel == asyseedspoilerobj:
         role = get(roles, name=asyncseedadmin)
     else:
-        await bot.send_message(user, "That command isn't allowed here.")
+        await user.send("That command isn't allowed here.")
         return None
 
     return role
@@ -459,18 +456,16 @@ async def getleaderboard(ctx):
     """
     user = ctx.message.author
     channel = ctx.message.channel
-    channels = ctx.message.server.channels
+    channels = ctx.message.guild.channels
     challengeseed = get(channels, name=challengeseedchannel)
     asyncseed = get(channels, name=asyncchannel)
 
     if channel == challengeseed:
-        leaderboard = bot.logs_from(
-            get(channels, name=challengeseedleaderboard), 100, reverse=True)
+        leaderboard = get(channels, name=challengeseedleaderboard).history(oldest_first=True, limit=100)
     elif channel == asyncseed:
-        leaderboard = bot.logs_from(
-            get(channels, name=asyncleaderboard), 100, reverse=True)
+        leaderboard = get(channels, name=asyncleaderboard).history(oldest_first=True, limit=100)
     else:
-        await bot.send_message(user, "That command isn't allowed here.")
+        await user.send("That command isn't allowed here.")
         return None
 
     async for x in leaderboard:
@@ -489,7 +484,7 @@ async def getspoilerchat(ctx):
 
     user = ctx.message.author
     channel = ctx.message.channel
-    channels = ctx.message.server.channels
+    channels = ctx.message.guild.channels
     challengeseed = get(channels, name=challengeseedchannel)
     asyncseed = get(channels, name=asyncchannel)
 
@@ -498,7 +493,7 @@ async def getspoilerchat(ctx):
     elif channel == asyncseed:
         spoilerchat = get(channels, name='async-spoilers')
     else:
-        await bot.send_message(user, "That command isn't allowed here.")
+        await user.send("That command isn't allowed here.")
         return None
 
     return spoilerchat
@@ -512,7 +507,7 @@ async def changeparticipants(ctx,increment = True, channel = None):
     :return: None
     """
 
-    participants = bot.logs_from(ctx.message.channel if channel is None else channel, 100, reverse=True)
+    participants = (ctx.message.channel if channel is None else channel).history(oldest_first=True, limit=100)
     async for x in participants:
         if x.author == bot.user:
             participants = x
@@ -522,7 +517,7 @@ async def changeparticipants(ctx,increment = True, channel = None):
     else:
         num_partcipents -= 1
     new_participants = "Number of participants: " + str(num_partcipents)
-    await bot.edit_message(participants, new_participants)
+    await participants.edit(content=new_participants)
 
 
 # used to clear channels for testing purposes
