@@ -39,6 +39,12 @@ asyncchannel = "async-seed_flags"
 asyncleaderboard = "async-leaderboard"
 asyncspoiler = "async-spoilers"
 
+data = dict()
+data["adminrole"] = dict([("challenge","challengeseedadmin"),("async","asyncseedadmin")])
+data["role"] = dict([("challenge","challengeseed"),("async","asyncseed")])
+data["channel"] = dict([("challenge","challengeseed"),("async","async-seed_flags")])
+data["leaderboardchannel"] = dict([("challenge","challengeseedleaderboard"),("async","async-leaderboard")])
+data["spoilerchannel"] = dict([("challenge","challengeseedspoilerchat"),("async","async-spoilers")])
 
 @bot.event
 async def on_ready():
@@ -167,11 +173,11 @@ async def purgemembers(ctx):
     user = ctx.message.author
     role = await getrole(ctx)
 
-    if role in user.roles and role.name in adminroles:
-        if role.name == challengeseedadmin:
-            role = get(ctx.message.guild.roles, name=challengeseedrole)
+    if role in user.roles and role.name in data["adminrole"].values():
+        if role.name == data["adminrole"]["challenge"]:
+            role = get(ctx.message.guild.roles, name=data["role"]["challenge"])
         else:
-            role = get(ctx.message.guild.roles, name=asyncseedrole)
+            role = get(ctx.message.guild.roles, name=data["role"]["async"])
         members = ctx.message.guild.members
         role_members = [x for x in members if role in x.roles]
 
